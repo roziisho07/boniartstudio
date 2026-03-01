@@ -1,0 +1,9 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+- [x] Clarify Project Requirements (Next.js + Sanity + TailwindCSS).
+- [x] Scaffold the Project (Next.js App Router + TypeScript + Tailwind + ESLint in `.`).
+- [x] Customize the Project (Sanity dependencies, client helper, env template, and homepage query).
+- [x] Install Required Extensions (No extensions required by setup info).
+- [x] Compile the Project (`npm run lint` and `npm run build` completed successfully).
+- [x] Create and Run Task (Skipped: standard npm scripts already available in `package.json`).
+- [x] Launch the Project (Pending user confirmation for debug/launch mode).
+- [x] Ensure Documentation is Complete (`README.md` and this file updated; HTML comments removed).
