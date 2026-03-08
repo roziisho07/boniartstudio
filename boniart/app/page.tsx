@@ -1,8 +1,11 @@
-import { redirect } from 'next/navigation'
-import { getLatestYear } from './lib/api'
-
+import { redirect } from "next/navigation";
+import { getLatestYear } from "./lib/api";
 
 export default async function Home() {
-  const latestYear = await getLatestYear() // 2026 or highest
-  redirect(`/year/${latestYear}`)
+  const latestYear = await getLatestYear();
+  if (!latestYear) {
+    redirect("/about");
+  }
+
+  redirect(`/year/${latestYear}`);
 }

@@ -1,89 +1,134 @@
-'use client'
-import { useState } from 'react'
-import Image from 'next/image'
-import { urlFor } from '@/sanity/lib/image'
-import { type SanityImageSource } from '@sanity/image-url/lib/types/types'
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+import { urlFor } from "@/sanity/lib/image";
+import { type SanityImageSource } from "@sanity/image-url/lib/types/types";
 
 interface Painting {
-  title: string
-  slug: { current: string }
-  image: SanityImageSource
-  exhibitionText?: string
-  medium?: string
-  dimensions?: string
+  title: string;
+  slug: { current: string };
+  image: SanityImageSource;
+  exhibitionText?: string;
+  medium?: string;
+  dimensions?: string;
 }
 
 interface PaintingGridProps {
-  paintings: Painting[]
+  paintings: Painting[];
 }
 
 type ImageWithMetadata = {
-  alt?: string
+  alt?: string;
   asset?: {
     metadata?: {
       dimensions?: {
-        width?: number
-        height?: number
-      }
-    }
+        width?: number;
+        height?: number;
+      };
+    };
+  };
+};
+
+function toGridImageUrl(source: SanityImageSource | undefined) {
+  if (!source) return null;
+
+  try {
+    // Request a right-sized asset from Sanity to avoid proxy timeouts in Next image optimizer.
+    return urlFor(source)
+      .width(1600)
+      .auto("format")
+      .quality(80)
+      .fit("max")
+      .url();
+  } catch {
+    return null;
   }
 }
 
-function toImageUrl(source: SanityImageSource | undefined) {
-  if (!source) return null
+function toModalImageUrl(source: SanityImageSource | undefined) {
+  if (!source) return null;
 
   try {
-    const url = urlFor(source).url()
-    return url || null
+    return urlFor(source)
+      .width(2200)
+      .auto("format")
+      .quality(85)
+      .fit("max")
+      .url();
   } catch {
-    return null
+    return null;
   }
 }
 
 export default function PaintingGrid({ paintings }: PaintingGridProps) {
-  const [selectedPainting, setSelectedPainting] = useState<Painting | null>(null)
+  const [selectedPainting, setSelectedPainting] = useState<Painting | null>(
+    null,
+  );
+  const modalImageUrl = selectedPainting
+    ? toModalImageUrl(selectedPainting.image)
+    : null;
 
   const getImageDimensions = (source: SanityImageSource) => {
-    const image = source as ImageWithMetadata
-    const width = image.asset?.metadata?.dimensions?.width
-    const height = image.asset?.metadata?.dimensions?.height
+    const image = source as ImageWithMetadata;
+    const width = image.asset?.metadata?.dimensions?.width;
+    const height = image.asset?.metadata?.dimensions?.height;
 
-    if (typeof width === 'number' && typeof height === 'number' && width > 0 && height > 0) {
-      return { width, height }
+    if (
+      typeof width === "number" &&
+      typeof height === "number" &&
+      width > 0 &&
+      height > 0
+    ) {
+      return { width, height };
     }
 
-    return { width: 1200, height: 1200 }
-  }
+    return { width: 1200, height: 1200 };
+  };
 
   return (
     <>
       <div className="columns-1 md:columns-2 lg:columns-3 gap-8 p-8">
-        {paintings.map((painting) => (
-          <div
-            key={painting.slug.current}
-            className="mb-8 break-inside-avoid cursor-pointer group"
-            onClick={() => setSelectedPainting(painting)}
-          >
-            <div className="relative bg-gray-50 mb-3 overflow-hidden">
-              {toImageUrl(painting.image) && (
-                <Image
-                  src={urlFor(painting.image).url()}
-                  alt={(painting.image as ImageWithMetadata).alt || painting.title}
-                  width={getImageDimensions(painting.image).width}
-                  height={getImageDimensions(painting.image).height}
-                  className="object-contain mix-blend-darken group-hover:scale-105 transition duration-500"
-                />
-              )}
+        {paintings.map((painting) => {
+          const gridImageUrl = toGridImageUrl(painting.image);
 
-              <div className="pointer-events-none absolute left-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="bg-black/65 text-white px-3 py-2 rounded-sm">
-                  <p className="text-sm font-medium leading-tight">{painting.title}</p>
-                  {painting.medium && <p className="text-xs text-white/80 leading-tight mt-1">{painting.medium}</p>}
+          return (
+            <div
+              key={painting.slug.current}
+              className="mb-8 break-inside-avoid cursor-pointer group"
+              onClick={() => setSelectedPainting(painting)}
+            >
+              <div className="relative bg-gray-50 mb-3 overflow-hidden">
+                {gridImageUrl && (
+                  <Image
+                    src={gridImageUrl}
+                    alt={
+                      (painting.image as ImageWithMetadata).alt ||
+                      painting.title
+                    }
+                    width={getImageDimensions(painting.image).width}
+                    height={getImageDimensions(painting.image).height}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized
+                    className="object-contain mix-blend-darken group-hover:scale-105 transition duration-500"
+                  />
+                )}
+
+                <div className="pointer-events-none absolute left-3 bottom-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="bg-black/65 text-white px-3 py-2 rounded-sm">
+                    <p className="text-sm font-medium leading-tight">
+                      {painting.title}
+                    </p>
+                    {painting.medium && (
+                      <p className="text-xs text-white/80 leading-tight mt-1">
+                        {painting.medium}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Full-size modal */}
@@ -104,12 +149,14 @@ export default function PaintingGrid({ paintings }: PaintingGridProps) {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="relative flex-1 w-full flex justify-center">
-              {toImageUrl(selectedPainting.image) && (
+              {modalImageUrl && (
                 <Image
-                  src={urlFor(selectedPainting.image).url()}
+                  src={modalImageUrl}
                   alt={selectedPainting.title}
                   width={600}
                   height={600}
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  unoptimized
                   className="w-auto h-auto max-w-full max-h-[72vh] md:max-h-[84vh] object-contain"
                 />
               )}
@@ -118,18 +165,24 @@ export default function PaintingGrid({ paintings }: PaintingGridProps) {
             <div className="md:w-80 space-y-4">
               <h2 className="text-2xl font-light">{selectedPainting.title}</h2>
               {selectedPainting.exhibitionText && (
-                <p className="text-sm text-gray-600">{selectedPainting.exhibitionText}</p>
+                <p className="text-sm text-gray-600">
+                  {selectedPainting.exhibitionText}
+                </p>
               )}
               {selectedPainting.medium && (
-                <p className="text-sm text-gray-500">{selectedPainting.medium}</p>
+                <p className="text-sm text-gray-500">
+                  {selectedPainting.medium}
+                </p>
               )}
               {selectedPainting.dimensions && (
-                <p className="text-sm text-gray-500">{selectedPainting.dimensions}</p>
+                <p className="text-sm text-gray-500">
+                  {selectedPainting.dimensions}
+                </p>
               )}
             </div>
           </div>
         </div>
       )}
     </>
-  )
+  );
 }

@@ -1,13 +1,24 @@
-import { getContact } from "../lib/api"
-import { PortableText } from "@portabletext/react"
+import type { Metadata } from "next";
+import { getContact } from "../lib/api";
+import { PortableText } from "@portabletext/react";
 
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Contact Shahid Hassan Boni for exhibitions, collaborations, and inquiries.",
+  alternates: {
+    canonical: "/contact",
+  },
+};
 
 export default async function ContactPage() {
-  const contact = await getContact()
-  
+  const contact = await getContact();
+
   return (
     <div className="max-w-2xl mx-auto py-16 px-8">
-      <h1 className="text-3xl font-light mb-8">{contact?.title || 'Contact'}</h1>
+      <h1 className="text-3xl font-light mb-8">
+        {contact?.title || "Contact"}
+      </h1>
       <div className="prose prose-sm text-gray-600">
         <PortableText value={contact?.info ?? []} />
       </div>
@@ -16,14 +27,21 @@ export default async function ContactPage() {
         {contact?.email && <p>Email: {contact.email}</p>}
         {contact?.instagram && (
           <p>
-            Instagram:{' '}
-            <a href={contact.instagram} target="_blank" rel="noreferrer" className="underline">
+            Instagram:{" "}
+            <a
+              href={contact.instagram}
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
               {contact.instagram}
             </a>
           </p>
         )}
-        {contact?.galleryRepresentation && <p>{contact.galleryRepresentation}</p>}
+        {contact?.galleryRepresentation && (
+          <p>{contact.galleryRepresentation}</p>
+        )}
       </div>
     </div>
-  )
+  );
 }

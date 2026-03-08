@@ -1,9 +1,13 @@
 export const getYearsQuery = `
-  *[_type == "painting" && defined(year)].year
-`
+  *[_type == "painting" && defined(year) && defined(image.asset)].year
+`;
+
+export const getLatestYearQuery = `
+  *[_type == "painting" && defined(year) && defined(image.asset)] | order(year desc)[0].year
+`;
 
 export const getPaintingsByYearQuery = `
-  *[_type == "painting" && year == $year] | order(_createdAt desc) {
+  *[_type == "painting" && year == $year && defined(image.asset)] | order(_createdAt desc) {
     _id,
     title,
     slug,
@@ -17,7 +21,7 @@ export const getPaintingsByYearQuery = `
     medium,
     dimensions
   }
-`
+`;
 
 export const getPaintingBySlugQuery = `
   *[_type == "painting" && slug.current == $slug][0] {
@@ -43,7 +47,7 @@ export const getPaintingBySlugQuery = `
       title
     }
   }
-`
+`;
 
 /**
  * Get all paintings (for sitemap or archive)
@@ -59,7 +63,7 @@ export const getAllPaintingsQuery = `
     medium,
     dimensions
   }
-`
+`;
 
 /**
  * Get recent paintings (for homepage preview)
@@ -77,7 +81,7 @@ export const getRecentPaintingsQuery = `
     },
     exhibitionText
   }
-`
+`;
 
 // ==================== ABOUT QUERIES ====================
 
@@ -95,10 +99,49 @@ export const getAboutQuery = `
       alt,
       caption
     },
+    cvData {
+      headline,
+      personalDetails {
+        dateOfBirth,
+        nationality,
+        languages
+      },
+      contactDetails {
+        email,
+        mobile,
+        addressLines
+      },
+      socialProfiles[] {
+        platform,
+        url,
+        handle
+      },
+      profile,
+      exhibitions[] | order(year desc) {
+        year,
+        title,
+        type,
+        venue,
+        cityCountry
+      },
+      workExperience[] {
+        year,
+        role,
+        organization,
+        description
+      },
+      education[] {
+        period,
+        degree,
+        specialization,
+        institution,
+        notes
+      }
+    },
     content,
     cv
   }
-`
+`;
 
 /**
  * Get about page with just text (for SEO/meta descriptions)
@@ -107,7 +150,7 @@ export const getAboutMetaQuery = `
   *[_type == "about"][0] {
     "plainText": pt::text(content)
   }
-`
+`;
 
 // ==================== NEWS/PRESS QUERIES ====================
 
@@ -129,7 +172,7 @@ export const getNewsPressQuery = `
       description
     }
   }
-`
+`;
 
 /**
  * Get only featured news entries
@@ -145,7 +188,7 @@ export const getFeaturedNewsQuery = `
       description
     }
   }
-`
+`;
 
 /**
  * Get latest news entry
@@ -161,7 +204,7 @@ export const getLatestNewsQuery = `
       description
     }
   }
-`
+`;
 
 // ==================== CONTACT QUERIES ====================
 
@@ -178,7 +221,7 @@ export const getContactQuery = `
     instagram,
     galleryRepresentation
   }
-`
+`;
 
 // ==================== SITE QUERIES ====================
 
@@ -208,7 +251,7 @@ export const getAllSiteContentQuery = `
       instagram
     }
   }
-`
+`;
 
 /**
  * Get sitemap data
@@ -223,7 +266,7 @@ export const getSitemapDataQuery = `
       year
     } | unique
   }
-`
+`;
 
 /**
  * Search paintings by title or medium
@@ -243,4 +286,4 @@ export const searchPaintingsQuery = `
     },
     medium
   }
-`
+`;
