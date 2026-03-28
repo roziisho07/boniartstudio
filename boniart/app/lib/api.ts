@@ -3,6 +3,7 @@ import { type TypedObject } from "sanity";
 import {
   getAboutQuery,
   getContactQuery,
+  getInSituMediaQuery,
   getLatestYearQuery,
   getNewsPressQuery,
   getPaintingsByYearQuery,
@@ -16,6 +17,7 @@ const SANITY_TAGS = {
   about: "sanity:about",
   newsPress: "sanity:newsPress",
   contact: "sanity:contact",
+  inSituMedia: "sanity:inSituMedia",
 } as const;
 
 const sanityFetch = async <T>(
@@ -124,6 +126,35 @@ export interface ContactData {
   galleryRepresentation?: string;
 }
 
+export interface InSituMediaImageItem {
+  _key: string;
+  _type: "mediaImage";
+  image?: {
+    asset?: Record<string, unknown>;
+    alt?: string;
+  };
+  caption?: string;
+  description?: PortableTextBlock[];
+}
+
+export interface InSituMediaVideoItem {
+  _key: string;
+  _type: "mediaVideo";
+  title?: string;
+  youtubeUrl?: string;
+  description?: PortableTextBlock[];
+}
+
+export type InSituMediaItem = InSituMediaImageItem | InSituMediaVideoItem;
+
+export interface InSituMediaData {
+  _id: string;
+  _updatedAt: string;
+  title: string;
+  intro: PortableTextBlock[];
+  items: InSituMediaItem[];
+}
+
 export async function getYears(): Promise<number[]> {
   const years = await sanityFetch<number[]>(getYearsQuery, {}, [
     SANITY_TAGS.paintings,
@@ -188,5 +219,23 @@ export async function getContact() {
   return {
     ...data,
     info: data.info ?? [],
+  };
+}
+
+export async function getInSituMedia() {
+  const data = await sanityFetch<InSituMediaData | null>(
+    getInSituMediaQuery,
+    {},
+    [SANITY_TAGS.inSituMedia],
+  );
+
+  if (!data) {
+    return null;
+  }
+
+  return {
+    ...data,
+    intro: data.intro ?? [],
+    items: data.items ?? [],
   };
 }

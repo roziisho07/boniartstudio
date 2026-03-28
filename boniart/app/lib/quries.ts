@@ -89,7 +89,7 @@ export const getRecentPaintingsQuery = `
  * Get about page content
  */
 export const getAboutQuery = `
-  *[_type == "about"][0] {
+  *[_type == "about"] | order(_updatedAt desc)[0] {
     _id,
     _updatedAt,
     title,
@@ -158,7 +158,7 @@ export const getAboutMetaQuery = `
  * Get all news/press entries
  */
 export const getNewsPressQuery = `
-  *[_type == "newsPress"][0] {
+  *[_type == "newsPress"] | order(_updatedAt desc)[0] {
     _id,
     _updatedAt,
     title,
@@ -178,7 +178,7 @@ export const getNewsPressQuery = `
  * Get only featured news entries
  */
 export const getFeaturedNewsQuery = `
-  *[_type == "newsPress"][0] {
+  *[_type == "newsPress"] | order(_updatedAt desc)[0] {
     "featured": entries[featured == true] | order(date desc)[0...3] {
       _key,
       date,
@@ -194,7 +194,7 @@ export const getFeaturedNewsQuery = `
  * Get latest news entry
  */
 export const getLatestNewsQuery = `
-  *[_type == "newsPress"][0] {
+  *[_type == "newsPress"] | order(_updatedAt desc)[0] {
     "latest": entries | order(date desc)[0] {
       _key,
       date,
@@ -212,7 +212,7 @@ export const getLatestNewsQuery = `
  * Get contact information
  */
 export const getContactQuery = `
-  *[_type == "contact"][0] {
+  *[_type == "contact"] | order(_updatedAt desc)[0] {
     _id,
     _updatedAt,
     title,
@@ -220,6 +220,33 @@ export const getContactQuery = `
     email,
     instagram,
     galleryRepresentation
+  }
+`;
+
+// ==================== IN SITU & MEDIA QUERIES ====================
+
+/**
+ * Get In Situ & Media page content
+ */
+export const getInSituMediaQuery = `
+  *[_type == "inSituMedia"] | order(_updatedAt desc)[0] {
+    _id,
+    _updatedAt,
+    title,
+    intro,
+    items[] {
+      _key,
+      _type,
+      caption,
+      description,
+      title,
+      youtubeUrl,
+      image {
+        ...,
+        asset->,
+        alt
+      }
+    }
   }
 `;
 

@@ -11,7 +11,7 @@ export async function generateMetadata({
   const { year } = await params;
 
   return {
-    title: `Works ${year}`,
+    title: `Art Works ${year}`,
     description: `Paintings and works by Shahid Hassan Boni from ${year}.`,
     alternates: {
       canonical: `/year/${year}`,
@@ -39,7 +39,7 @@ export default async function YearPage({
   return (
     <div>
       <div className="sticky top-0 bg-white/80 backdrop-blur-sm border-b border-gray-100 px-8 py-4 z-10">
-        <h1 className="text-3xl font-light">Works {year}</h1>
+        <h1 className="text-3xl font-light">Art Works {year}</h1>
       </div>
       <PaintingGrid paintings={paintings} />
     </div>
