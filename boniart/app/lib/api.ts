@@ -223,11 +223,12 @@ export async function getContact() {
 }
 
 export async function getInSituMedia() {
-  const data = await sanityFetch<InSituMediaData | null>(
-    getInSituMediaQuery,
-    {},
-    [SANITY_TAGS.inSituMedia],
-  );
+  const data = await client.fetch<InSituMediaData | null>(getInSituMediaQuery, {}, {
+    cache: "no-store",
+    next: {
+      revalidate: 0,
+    },
+  });
 
   if (!data) {
     return null;
